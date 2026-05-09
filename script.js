@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCurrentFoods();
     renderCalendar();
     document.getElementById('current-date').innerText = "Hoy: " + new Date().toLocaleDateString();
+    // Llamamos a la función para que vaya despertando al servidor
+    warmUpAPI();
 });
 
 // --- LÓGICA DE CALCULO Y RENDER HOY ---
@@ -63,14 +65,36 @@ function removeFood(i) { if (confirm("¿Borrar?")) { currentFoods.splice(i, 1); 
 
 // --- BÚSQUEDA Y AÑADIR ---
 async function searchProduct() {
-    const q = document.getElementById('searchInput').value; if (!q) return;
+    const q = document.getElementById('searchInput').value; 
+    if (!q) return;
+    
     document.getElementById('resultsCard').style.display = 'block';
     document.getElementById('results').innerHTML = 'Buscando...';
+    
     try {
-        const res = await fetch(`https://es.openfoodfacts.org/cgi/search.pl?search_terms=${q}&search_simple=1&action=process&json=1&page_size=10`);
+        // encodeURIComponent "limpia" el texto. Ejemplo: convierte "Pan integral" en "Pan%20integral"
+        const queryLimpia = encodeURIComponent(q);
+        
+        const res = await fetch(`https://es.openfoodfacts.org/cgi/search.pl?search_terms=${queryLimpia}&search_simple=1&action=process&json=1&page_size=10`);
+        
+        // Comprobamos que el servidor haya respondido bien antes de intentar leer los datos
+        if (!res.ok) {
+            throw new Error(`Error del servidor: ${res.status}`);
+        }
+
         const data = await res.json();
         renderResults(data.products);
-    } catch (e) { alert("Error al conectar con la base de datos"); }
+        
+    } catch (e) { 
+        // Mostramos el error real en la consola oculta del navegador
+        console.error("Detalle del error:", e);
+        
+        document.getElementById('results').innerHTML = `
+            <p style="color: red; font-size: 0.9rem;">
+                Hubo un error de conexión. Inténtalo de nuevo.
+            </p>
+        `;
+    }
 }
 
 function renderResults(products) {
@@ -224,4 +248,13 @@ function startScanner() {
         const data = await res.json();
         if(data.status === 1) renderResults([data.product]); else alert("No encontrado");
     });
+}
+
+// --- CALENTAMIENTO DE LA API ---
+// Esta función se ejecuta sola en segundo plano para "despertar" la conexión
+function warmUpAPI() {
+    // Buscamos un solo resultado ("agua") de forma silenciosa
+    fetch(`https://es.openfoodfacts.org/cgi/search.pl?search_terms=agua&search_simple=1&action=process&json=1&page_size=1`)
+        .then(() => console.log("Conexión con la base de datos lista."))
+        .catch(() => console.log("La base de datos está dormida, la primera búsqueda tardará un poco."));
 }
