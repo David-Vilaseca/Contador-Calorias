@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MacroTracker Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h2 id="current-date">Hoy</h2>
+        <div class="macros-grid">
+            <div class="macro-box">Kcal<br><strong id="total-kcal">0 / 0</strong></div>
+            <div class="macro-box">Prot<br><strong id="total-prot">0 / 0g</strong></div>
+            <div class="macro-box">HC<br><strong id="total-carb">0 / 0g</strong></div>
+            <div class="macro-box">Grasas<br><strong id="total-fat">0 / 0g</strong></div>
+            <div class="macro-box">Fibra<br><strong id="total-fiber">0 / 0g</strong></div>
+        </div>
+        <button onclick="saveAndResetDay()" class="btn-danger">Finalizar y Guardar Día</button>
+    </div>
+
+    <div class="card" id="today-foods-card" style="display: none;">
+        <h2>🍽️ Comidas de Hoy</h2>
+        <div id="today-foods-list"></div>
+    </div>
+
+    <div class="card">
+        <h2>🔍 Añadir Alimento</h2>
+        <div id="reader"></div>
+        <button onclick="startScanner()" class="btn-success">📷 Escanear Código</button>
+        <hr class="divider">
+        <input type="text" id="searchInput" placeholder="Ej: Avena Mercadona...">
+        <button onclick="searchProduct()">Buscar</button>
+    </div>
+
+    <div class="card" id="resultsCard" style="display: none;">
+        <div id="results"></div>
+    </div>
+
+    <div class="card">
+        <h2>📅 Historial</h2>
+        <div id="calendar-container"></div>
+        
+        <div id="day-detail-section" style="display: none; margin-top: 20px; padding-top: 15px; border-top: 2px solid #f3f4f6;">
+            <h3 id="selected-day-title" style="margin-bottom: 10px;">Día Seleccionado</h3>
+            <div id="selected-day-content"></div>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

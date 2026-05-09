@@ -1,0 +1,43 @@
+/* ... (mantenemos los estilos anteriores) ... */
+
+:root {
+    --primary: #2563eb;
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --text: #1f2937;
+}
+
+body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+.container { max-width: 600px; width: 100%; }
+.card { background: var(--card); padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 15px; }
+h2 { margin-top: 0; font-size: 1.2rem; border-bottom: 2px solid var(--bg); padding-bottom: 5px; }
+input[type="text"], input[type="number"] { width: calc(100% - 24px); padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; }
+button { background-color: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; }
+
+.btn-danger { background-color: #475569; margin-top: 10px; }
+.btn-success { background-color: #059669; margin-bottom: 15px; }
+
+.macros-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin: 15px 0; }
+.macro-box { background: #f8fafc; padding: 8px 2px; border-radius: 6px; text-align: center; font-size: 0.75rem; border: 1px solid #e2e8f0; }
+.macro-box strong { display: block; font-size: 0.85rem; color: var(--primary); margin-top: 4px; }
+
+.food-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
+.food-item-controls input { width: 50px; margin: 0; padding: 8px; text-align: center; }
+.btn-delete { background-color: #ef4444; padding: 8px; margin: 0; width: auto; font-size: 1.1rem; border-radius: 6px;}
+
+.divider { border: 0; border-top: 1px solid #eee; margin: 15px 0; }
+#reader { width: 100%; border-radius: 8px; overflow: hidden; }
+
+/* CALENDARIO */
+.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.calendar-header button { width: auto; padding: 5px 15px; background: #e2e8f0; color: #1f2937; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.calendar-day { padding: 10px 0; border-radius: 6px; text-align: center; font-size: 0.9rem; background: #f8fafc; border: 1px solid #e2e8f0; cursor: pointer; }
+.calendar-day.empty { cursor: default; border: none; background: transparent; }
+.calendar-day.has-data { background-color: #10b981; color: white; border-color: #059669; }
+.calendar-day.selected { border: 2px solid #2563eb; box-shadow: 0 0 8px rgba(37,99,235,0.4); transform: scale(1.05); }
+
+/* BOTONES DE ACCIÓN EN HISTORIAL */
+.history-actions { display: flex; gap: 10px; margin-top: 15px; }
+.btn-edit-hist { background-color: #f59e0b; flex: 1; }
+.btn-del-hist { background-color: #ef4444; flex: 1; }
