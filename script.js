@@ -1,3 +1,4 @@
+// --- MIS OBJETIVOS DIARIOS ---
 const TARGETS = { kcal: 2500, prot: 150, carb: 285, fat: 85, fiber: 35 };
 
 let currentFoods = JSON.parse(localStorage.getItem('currentFoods')) || [];
@@ -41,7 +42,10 @@ function renderCurrentFoods() {
     card.style.display = 'block';
     list.innerHTML = currentFoods.map((f, i) => `
         <div class="food-item">
-            <div><strong>${f.name}</strong><br><small>${(f.kcal * f.grams / 100).toFixed(0)} kcal</small></div>
+            <div class="food-item-info">
+                <strong>${f.name}</strong>
+                <small>${(f.kcal * f.grams / 100).toFixed(0)} kcal</small>
+            </div>
             <div class="food-item-controls">
                 <input type="number" value="${f.grams}" onchange="updateGrams(${i}, this.value)"> g
                 <button class="btn-delete" onclick="removeFood(${i})">🗑️</button>
@@ -66,17 +70,41 @@ async function searchProduct() {
         const res = await fetch(`https://es.openfoodfacts.org/cgi/search.pl?search_terms=${q}&search_simple=1&action=process&json=1&page_size=10`);
         const data = await res.json();
         renderResults(data.products);
-    } catch (e) { alert("Error"); }
+    } catch (e) { alert("Error al conectar con la base de datos"); }
 }
 
 function renderResults(products) {
-    const div = document.getElementById('results'); div.innerHTML = '';
+    const div = document.getElementById('results'); 
+    div.innerHTML = '';
+    
+    if (products.length === 0) {
+        div.innerHTML = '<p>No se encontraron resultados.</p>';
+        return;
+    }
+
     products.forEach(p => {
         const n = p.nutriments || {};
-        const data = { id: p._id, name: p.product_name || '?', kcal: n['energy-kcal_100g'] || 0, prot: n.proteins_100g || 0, carb: n.carbohydrates_100g || 0, fat: n.fat_100g || 0, fiber: n.fiber_100g || 0 };
-        div.innerHTML += `<div style="padding:10px; border-bottom:1px solid #eee">${data.name}<br>
-            <input type="number" id="g-${data.id}" placeholder="Gramos" style="width:70px">
-            <button onclick='addFood(${JSON.stringify(data)})'>Add</button></div>`;
+        const data = { 
+            id: p._id, 
+            name: p.product_name || 'Alimento desconocido', 
+            brand: p.brands ? p.brands.split(',')[0] : '', // Recuperamos la marca
+            kcal: n['energy-kcal_100g'] || 0, 
+            prot: n.proteins_100g || 0, 
+            carb: n.carbohydrates_100g || 0, 
+            fat: n.fat_100g || 0, 
+            fiber: n.fiber_100g || 0 
+        };
+        
+        // Volvemos a mostrar todo: Marca, Nombre y Macros por 100g
+        div.innerHTML += `
+            <div style="padding:10px; border-bottom:1px solid #eee">
+                <strong>${data.name}</strong> <small style="color: gray;">${data.brand}</small><br>
+                <small>Por 100g: ${data.kcal}kcal | P: ${data.prot}g | HC: ${data.carb}g | G: ${data.fat}g | F: ${data.fiber}g</small>
+                <div style="display:flex; gap:5px; margin-top:8px">
+                    <input type="number" id="g-${data.id}" placeholder="Gramos" style="margin:0; flex: 1;">
+                    <button onclick="addFood(${JSON.stringify(data).replace(/"/g, '&quot;')})" style="width: auto; padding: 0 15px;">Añadir</button>
+                </div>
+            </div>`;
     });
 }
 
@@ -85,6 +113,9 @@ function addFood(data) {
     if (!g) return;
     currentFoods.push({ ...data, grams: g });
     calculateTotals(); renderCurrentFoods();
+    document.getElementById('searchInput').value = ''; // Limpiar buscador
+    document.getElementById('resultsCard').style.display = 'none'; // Ocultar resultados
+    window.scrollTo({top:0, behavior:'smooth'});
 }
 
 // --- CALENDARIO E HISTORIAL ---
@@ -138,8 +169,8 @@ function selectDay(dateStr) {
             <div class="macro-box">F<br><strong>${dayData.data.fiber.toFixed(0)}g</strong></div>
         </div>
         <div class="history-actions">
-            <button class="btn-edit-hist" onclick="editHistoryDay('${dateStr}')">✏️ Editar Totales</button>
-            <button class="btn-del-hist" onclick="deleteHistoryDay('${dateStr}')">🗑️ Borrar Día</button>
+            <button class="btn-edit-hist" onclick="editHistoryDay('${dateStr}')">✏️ Editar</button>
+            <button class="btn-del-hist" onclick="deleteHistoryDay('${dateStr}')">🗑️ Borrar</button>
         </div>
     `;
 }
@@ -181,7 +212,7 @@ function editHistoryDay(dateStr) {
     selectDay(dateStr);
 }
 
-// ESCÁNER (Igual que antes)
+// ESCÁNER
 let scanner;
 function startScanner() {
     if (!scanner) scanner = new Html5Qrcode("reader");
